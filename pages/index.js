@@ -1,48 +1,52 @@
-import fs from 'fs'
-import matter from 'gray-matter'
-import path from 'path'
-import Head from 'next/head'
-import Post from '../components/Post'
+import fs from "fs";
+import matter from "gray-matter";
+import path from "path";
+import Head from "next/head";
+import Post from "../components/Post";
+import {sortByDate} from '../utils' 
 
-export default function Home({posts}) {
+export default function Home({ posts }) {
   return (
     <div>
       <Head>
         <title>Dev Blog</title>
       </Head>
-      
+
       <div className="posts">
         {posts.map((post, index) => (
-          <Post post={post} />
+          <Post key={index} post={post} />
         ))}
       </div>
     </div>
-  )
+  );
 }
-
+ 
 export async function getStaticProps() {
   //Gets files from the posts directory
-  const files = fs.readdirSync(path.join('posts'))
+  const files = fs.readdirSync(path.join("posts"));
 
   //Get slug and frontmatter from posts
-  const posts = files.map(filename => {
+  const posts = files.map((filename) => {
     //Create slug
-    const slug = filename.replace('md', '')
+    const slug = filename.replace(".md", "");
 
     //Get frontmatter
-    const markDownWithMeta = fs.readFileSync(path.join('posts', filename), 'utf-8')
+    const markDownWithMeta = fs.readFileSync(
+      path.join("posts", filename),
+      "utf-8"
+    );
 
-    const {data:frontmatter} = matter(markDownWithMeta)
+    const { data: frontmatter } = matter(markDownWithMeta);
 
     return {
       slug,
-      frontmatter
-  }
-  })
+      frontmatter,
+    };
+  });
 
   return {
-    props: {
-      posts
+    props: { 
+      posts: posts.sort(sortByDate), 
     },
-  }
+  };
 }
